@@ -23,7 +23,7 @@ const ListLeft = () => {
                 </ListItem>
             </Link>
             <Divider />
-            <Link className="link" to='/instruct'>
+            <Link className="link" to='/instructions'>
                 <ListItem button>
                     <ListItemText primary='Instructions for authors' />
                 </ListItem>

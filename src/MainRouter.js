@@ -2,9 +2,15 @@ import React, { useContext } from 'react'
 import { Route, Routes, withRouter, NavLink } from 'react-router-dom'
 import Home from './components/home/Home';
 import SubmitPaper from './components/submission/SubmitPaper';
+import InstructionsForAuthors from './components/simple/InstructionForAuthors';
+
 // import Home from './components/Home'
 // import TitleCard from './components/TitleCard';
 import { UserContext } from './providers/UserProvider';
+import EditorialBoard from './components/simple/EditorialBoard';
+import FeedbackPage from './components/feedback/Feedback';
+import Archives from './components/archives/AllArchives';
+
 // import SubmitPaper from './components/submitPaper/SubmitPaper';
 // import Submissions from './components/submitPaper/Submissions';
 // import SubmissionFiles from './components/submitPaper/SubmissionFiles';
@@ -21,8 +27,12 @@ function MainRouter() {
             <Routes>
                 <Route path="/" exact element={<Home />} />
                 <Route path="/submit-paper" exact element={<SubmitPaper />} />
+                <Route path="/my-profile" exact element={<SubmitPaper />} />
+                <Route path="/instructions" exact element={<InstructionsForAuthors />} />
+                <Route path="/editorial" exact element={<EditorialBoard />} />
+                <Route path="/feedback" exact element={<FeedbackPage />} />
+                <Route path="/archives" exact element={<Archives />} />
                 {/* <Route path="/signup" exact component={Signup} />
-                <Route path="/login" exact component={Login} />
                 <Route path="/submissions" exact component={Submissions} />
                 <Route path="/submissions/:id" exact component={SubmissionFiles} />
                 <Route path="/my-submissions" exact component={UserSubmissions} /> */}

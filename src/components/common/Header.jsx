@@ -15,10 +15,15 @@ import ListItemText from '@mui/material/ListItemText';
 // import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Avatar } from '@mui/material';
+import { Avatar, Fade, Paper, Popper, Tooltip } from '@mui/material';
 import MainRouter from '../../MainRouter';
 import { Link } from 'react-router-dom';
 import ListLeft from "./ListLeft"
+import { makeStyles } from '@mui/styles';
+import MenuIcon from '@mui/icons-material/Menu';
+import AvatarPopup from './AvatarPopup';
+import MenuEnd from './MenuEnd';
+
 const Header = (props) => {
 
     const drawerWidth = 240;
@@ -40,19 +45,28 @@ const Header = (props) => {
     );
 
     const container = window !== undefined ? () => window().document.body : undefined;
+    const classes = useStyles()
+    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [open, setOpen] = React.useState(false);
+    const [placement, setPlacement] = React.useState();
 
+    const handleClick = (newPlacement) => (event) => {
+        setAnchorEl(event.currentTarget);
+        setOpen((prev) => placement !== newPlacement || !prev);
+        setPlacement(newPlacement);
+    };
     return (
-        <Box sx={{ display: 'flex', backgroundColor: "#dfe9ec", height: "100vh" }}>
+        <Box sx={{ display: 'flex', backgroundColor: "rgba(0,0,0,0.06)", minHeight: "100vh" }}>
             <CssBaseline />
             <AppBar
                 position="fixed"
-                style={{ backgroundColor: "#000C66" }}
+                style={{ backgroundColor: "#36454F", display: "flex", justifyContent: "beetwen" }}
                 sx={{
                     width: { sm: `calc(100% - ${drawerWidth}px)` },
                     ml: { sm: `${drawerWidth}px` },
                 }}
             >
-                <Toolbar>
+                <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -60,13 +74,24 @@ const Header = (props) => {
                         onClick={handleDrawerToggle}
                         sx={{ mr: 2, display: { sm: 'none' } }}
                     >
-                        {/* <MenuIcon /> */}
+                        <MenuIcon />
                     </IconButton>
-                    <Avatar src="/android-chrome-192x192.png" alt="indian-hdrobiology" />
+                    <Avatar IconComponent src="/android-chrome-192x192.png" alt="indian-hdrobiology" />
                     <h2 className="menu-header-title">
                         INDIAN HYDROBIOLOGY
                     </h2>
+                    <MenuEnd handleClick={handleClick} />
                 </Toolbar>
+
+                <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
+                    {({ TransitionProps }) => (
+                        <Fade {...TransitionProps} timeout={350}>
+                            <Paper style={{ marginTop: 20, marginX: 30 }}>
+                                <AvatarPopup setOpen={setOpen} />
+                            </Paper>
+                        </Fade>
+                    )}
+                </Popper>
             </AppBar>
             <Box
                 component="nav"
@@ -84,7 +109,7 @@ const Header = (props) => {
                     }}
                     sx={{
                         display: { xs: 'block', sm: 'none' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: "#36454F" },
                     }}
                 >
                     {drawer}
@@ -93,7 +118,7 @@ const Header = (props) => {
                     variant="permanent"
                     sx={{
                         display: { xs: 'none', sm: 'block' },
-                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+                        '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, backgroundColor: "#36454F" },
                     }}
                     open
                 >
@@ -107,9 +132,15 @@ const Header = (props) => {
                 <Toolbar />
                 <MainRouter />
             </Box>
-        </Box>
+        </Box >
     );
 }
 
+
+const useStyles = makeStyles({
+    MuiDrawerPaper: {
+        backgroundColor: "#36454F"
+    }
+})
 
 export default Header
