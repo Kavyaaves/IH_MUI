@@ -10,6 +10,7 @@ import { UserContext } from './providers/UserProvider';
 import EditorialBoard from './components/simple/EditorialBoard';
 import FeedbackPage from './components/feedback/Feedback';
 import Archives from './components/archives/AllArchives';
+import AllSubmissions from './components/submission/AllSubmissions';
 
 // import SubmitPaper from './components/submitPaper/SubmitPaper';
 // import Submissions from './components/submitPaper/Submissions';
@@ -32,6 +33,7 @@ function MainRouter() {
                 <Route path="/editorial" exact element={<EditorialBoard />} />
                 <Route path="/feedback" exact element={<FeedbackPage />} />
                 <Route path="/archives" exact element={<Archives />} />
+                <Route path="/submissions" exact element={<AllSubmissions />} />
                 {/* <Route path="/signup" exact component={Signup} />
                 <Route path="/submissions" exact component={Submissions} />
                 <Route path="/submissions/:id" exact component={SubmissionFiles} />

@@ -67,7 +67,9 @@ const SubmitPaper = () => {
                                     title: title,
                                     status: "Submitted",
                                     id: postid,
-                                    Submitted: [...posts],
+                                    files: {
+                                        Submitted: [...posts],
+                                    },
                                     userId: auth.currentUser?.uid,
                                     labels: ['Submitted'],
                                     username: auth.currentUser?.displayName,

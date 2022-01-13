@@ -41,6 +41,12 @@ const ListLeft = () => {
                 </ListItem>
             </Link>
             <Divider />
+            <Link className="link" to='/submissions'>
+                <ListItem button>
+                    <ListItemText primary='Submissions' />
+                </ListItem>
+            </Link>
+            <Divider />
             <Link className="link" to='/membership'>
                 <ListItem button>
                     <ListItemText primary='Membership' />
