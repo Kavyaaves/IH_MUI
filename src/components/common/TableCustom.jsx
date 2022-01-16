@@ -120,7 +120,7 @@ function EnhancedTableHead(props) {
                     <TableCell
                         key={headCell.id}
                         align={headCell.numeric ? 'right' : 'left'}
-                        padding={headCell.disablePadding ? 'none' : 'normal'}
+                        padding="none"
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
                         <TableSortLabel
@@ -197,10 +197,9 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({ rows, headCells, selectors }) {
+export default function EnhancedTable({ rows, headCells, selected, setSelected }) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
     const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -213,7 +212,7 @@ export default function EnhancedTable({ rows, headCells, selectors }) {
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-            const newSelecteds = rows.map((n) => n.name);
+            const newSelecteds = rows.map((n) => n);
             setSelected(newSelecteds);
             return;
         }
@@ -221,14 +220,14 @@ export default function EnhancedTable({ rows, headCells, selectors }) {
     };
 
     const handleClick = (event, name) => {
-        const selectedIndex = selected.indexOf(name);
+        const selectedIndex = selected?.indexOf(name);
         let newSelected = [];
 
         if (selectedIndex === -1) {
             newSelected = newSelected.concat(selected, name);
         } else if (selectedIndex === 0) {
             newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
+        } else if (selectedIndex === selected?.length - 1) {
             newSelected = newSelected.concat(selected.slice(0, -1));
         } else if (selectedIndex > 0) {
             newSelected = newSelected.concat(
@@ -249,16 +248,15 @@ export default function EnhancedTable({ rows, headCells, selectors }) {
         setPage(0);
     };
 
-    const isSelected = (name) => selected.indexOf(name) !== -1;
+    const isSelected = (name) => selected?.indexOf(name) !== -1;
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows?.length) : 0;
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -267,12 +265,12 @@ export default function EnhancedTable({ rows, headCells, selectors }) {
                     >
                         <EnhancedTableHead
                             headCells={headCells}
-                            numSelected={selected.length}
+                            numSelected={selected?.length}
                             order={order}
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
+                            rowCount={rows?.length}
                         />
                         <TableBody>
                             {/* if you don't need to support IE11, you can replace the `stableSort` call with:
@@ -280,20 +278,20 @@ export default function EnhancedTable({ rows, headCells, selectors }) {
                             {stableSort(rows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
-                                    const isItemSelected = isSelected(row.name);
+                                    const isItemSelected = isSelected(row);
                                     const labelId = `enhanced-table-checkbox-${index}`;
                                     return (
                                         <TableRow
                                             hover
                                             role="checkbox"
-                                            aria-checked={isItemSelected}
+                                            aria-checked={isItemSelected == row?.id}
                                             tabIndex={-1}
-                                            key={row.name}
-                                            selected={isItemSelected}
+                                            key={row.id}
+                                            selected={isItemSelected == row.id}
                                         >
-                                            <TableCell padding="checkbox">
+                                            <TableCell padding="checkbox" >
                                                 <Checkbox
-                                                    onClick={(event) => handleClick(event, row.name)}
+                                                    onClick={(event) => handleClick(event, row)}
                                                     color="primary"
                                                     checked={isItemSelected}
                                                     inputProps={{
@@ -303,7 +301,7 @@ export default function EnhancedTable({ rows, headCells, selectors }) {
                                             </TableCell>
 
                                             {headCells?.map((s, i) =>
-                                                <TableCell align="left">{s.render(row)}</TableCell>
+                                                <TableCell align="left" padding="none">{s.render(row)}</TableCell>
                                             )}
                                             {/* <TableCell
                                                 component="th"
@@ -334,7 +332,7 @@ export default function EnhancedTable({ rows, headCells, selectors }) {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={rows.length}
+                    count={rows?.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}

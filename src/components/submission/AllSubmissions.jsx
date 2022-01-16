@@ -14,12 +14,13 @@ const AllSubmissions = () => {
     const classes = useStyles()
     const [submissions, setSubmissions] = useState([])
     const [reviewerModal, setReviewerModal] = useState(false)
+    const [selected, setSelected] = useState([]);
+
     useEffect(() => {
         const q = collection(db, "posts");
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const cities = [];
             querySnapshot.forEach(async (doc) => {
-                // const reviewer = await getReviewer(doc.data()) || ""
                 cities.push({ ...doc.data(), postId: doc.id });
             });
             setSubmissions(cities)
@@ -37,7 +38,7 @@ const AllSubmissions = () => {
             // numeric: true,
             disablePadding: false,
             label: 'Title',
-            render: (row) => <Link to={"/submission/" + row?.id}>{row?.title}</Link>
+            render: (row) => <Link to={"/submissions/" + row?.id}>{row?.title}</Link>
         },
         {
             id: 'id',
@@ -53,7 +54,7 @@ const AllSubmissions = () => {
             disablePadding: false,
             label: 'Submitted On',
             render: (row) => <span>
-                {row?.timestamp.toDate().toDateString() + " " + row?.timestamp.toDate().toLocaleTimeString(undefined, {
+                {row?.timestamp?.toDate().toDateString() + " " + row?.timestamp?.toDate().toLocaleTimeString(undefined, {
                     timezone: 'Asia/kolkata',
                 })}
             </span>
@@ -115,7 +116,7 @@ const AllSubmissions = () => {
             </Typography>
             <br />
             <div style={{ minHeight: 400, width: '100%' }}>
-                <TableCustom rows={submissions} headCells={columns} />
+                <TableCustom rows={submissions} headCells={columns} selected={selected} setSelected={setSelected} />
             </div>
             {reviewerModal && <ReviewerModal isVisible={reviewerModal} onClose={() => setReviewerModal(false)} />}
         </Paper>

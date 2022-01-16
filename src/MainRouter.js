@@ -11,6 +11,7 @@ import EditorialBoard from './components/simple/EditorialBoard';
 import FeedbackPage from './components/feedback/Feedback';
 import Archives from './components/archives/AllArchives';
 import AllSubmissions from './components/submission/AllSubmissions';
+import SubmissionFiles from './components/submission/SubmissionFiles';
 
 // import SubmitPaper from './components/submitPaper/SubmitPaper';
 // import Submissions from './components/submitPaper/Submissions';
@@ -34,6 +35,7 @@ function MainRouter() {
                 <Route path="/feedback" exact element={<FeedbackPage />} />
                 <Route path="/archives" exact element={<Archives />} />
                 <Route path="/submissions" exact element={<AllSubmissions />} />
+                <Route path="/submissions/:postId" exact element={<SubmissionFiles />} />
                 {/* <Route path="/signup" exact component={Signup} />
                 <Route path="/submissions" exact component={Submissions} />
                 <Route path="/submissions/:id" exact component={SubmissionFiles} />

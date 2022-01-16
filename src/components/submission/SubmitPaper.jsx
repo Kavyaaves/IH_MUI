@@ -15,7 +15,7 @@ import { Link, Redirect } from 'react-router-dom';
 import Dropzone from 'react-dropzone';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { createStyles, makeStyles } from '@mui/styles';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage, auth } from '../../database';
 import { UserContext } from '../../providers/UserProvider';
@@ -62,14 +62,14 @@ const SubmitPaper = () => {
                         getDownloadURL(storageRef)
                             .then((url) => {
                                 console.log("get download", url)
-                                posts.push({ filename: file.name, url: url, id: uuidv4() });
+                                posts.push({ filename: file.name, ...file, url: url, id: uuidv4() });
                                 setDoc(refFire, {
                                     title: title,
                                     status: "Submitted",
                                     id: postid,
-                                    files: {
-                                        Submitted: [...posts],
-                                    },
+                                    // files: {
+                                    //     Submitted: [...posts],
+                                    // },
                                     userId: auth.currentUser?.uid,
                                     labels: ['Submitted'],
                                     username: auth.currentUser?.displayName,
@@ -77,6 +77,10 @@ const SubmitPaper = () => {
                                 },
                                     { merge: true }
                                 );
+                                const subRef = collection(db, "posts", postid, "files")
+                                addDoc(subRef, {
+                                    Submitted: [...posts],
+                                })
                                 setFiles([])
                                 setFileNames([])
                                 setTitle("")
@@ -165,7 +169,7 @@ const SubmitPaper = () => {
                 <Button
                     color='primary'
                     variant='contained'
-                    disabled={!user || files?.length === 0}
+                    // disabled={!user || files?.length === 0}
                     onClick={uploadFile}
                     type="submit"
                     className={classes.submitButton}>
