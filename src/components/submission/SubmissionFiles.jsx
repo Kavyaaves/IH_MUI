@@ -3,9 +3,11 @@ import Paper from '@mui/material/Paper'
 import { useParams } from "react-router-dom"
 import { collection, doc, getDoc, onSnapshot, setDocument } from 'firebase/firestore'
 import { db } from '../../database'
-import { AppBar, Box, Tab, Tabs, Typography } from '@mui/material'
+import { AppBar, Box, Button, Tab, Tabs, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import FilesList from './FilesList'
+import CommentsAccordian from './CommentsAccordian'
+import CommentsList from './CommentsList'
 import CommentsTab from './CommentsTab'
 const SubmissionFiles = () => {
     const { postId } = useParams()
@@ -13,6 +15,9 @@ const SubmissionFiles = () => {
     const [key, setKey] = useState("Submitted")
     const [id, setId] = useState("")
     const [labels, setLabels] = useState([])
+    const [comments, setComments] = React.useState([])
+    const [show, setShow] = React.useState(false)
+
     const classes = useStyles()
     useEffect(async () => {
         const unsubscribe = await onSnapshot(collection(db, "posts", postId, "files"), (querySnapshot) => {
@@ -23,12 +28,25 @@ const SubmissionFiles = () => {
         });
         return () => unsubscribe()
     }, [])
+
+    React.useEffect(async () => {
+        const unsubscribe = await onSnapshot(collection(db, "posts", postId, "comments"), (querySnapshot) => {
+            let commentsData = []
+            querySnapshot.forEach(async (comment) => {
+                let sender = await getDoc(doc(db, "users", comment.data().senderId))
+                commentsData.push({ ...comment.data(), id: comment.id, sender: sender.data() })
+            })
+            setComments(commentsData)
+        });
+        return () => unsubscribe()
+    }, [])
     useEffect(async () => {
         const unsubscribe = await onSnapshot(doc(db, "posts", postId), (doc) => {
             setLabels(doc.data()?.labels)
         });
         return () => unsubscribe()
     }, [])
+
     return (
         <>
             <AppBar position='static' className={classes.appBar}>
@@ -45,18 +63,16 @@ const SubmissionFiles = () => {
                     {labels?.map((tab, i) =>
                         <Tab label={tab} {...a11yProps(i)} value={tab} key={i} />
                     )}
-                    <Tab label="Comments" {...a11yProps(1000)} value="Comments" />
                 </Tabs>
 
             </AppBar>
-            {key == "Comments" ?
-                <TabPanel value="Comments" index="Comments">
-                    <CommentsTab />
-                </TabPanel>
-                :
-                <TabPanel value={key} index={key}>
-                    <FilesList tab={key} postId={postId} id={id} file={document[key]} />
-                </TabPanel>}
+            <TabPanel value={key} index={key}>
+                <FilesList tab={key} postId={postId} id={id} file={document[key]} />
+            </TabPanel>
+            <Button variant="contained" onClick={() => setShow(!show)}>{show ? "Hide " : "Show "}Comments</Button>
+            <br />
+            {show &&
+                <CommentsList postId={postId} />}
         </>
     )
 }

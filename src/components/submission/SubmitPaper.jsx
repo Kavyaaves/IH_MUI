@@ -67,6 +67,7 @@ const SubmitPaper = () => {
                                     title: title,
                                     status: "Submitted",
                                     id: postid,
+                                    comments: [],
                                     // files: {
                                     //     Submitted: [...posts],
                                     // },
