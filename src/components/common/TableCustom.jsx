@@ -197,7 +197,7 @@ EnhancedTableToolbar.propTypes = {
     numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({ rows, headCells, selected, setSelected }) {
+export default function EnhancedTable({ rows, headCells, selected, setSelected, tab }) {
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [page, setPage] = React.useState(0);

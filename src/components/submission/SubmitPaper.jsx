@@ -56,21 +56,17 @@ const SubmitPaper = () => {
                 console.log(t)
                 files?.map((file) => {
                     const uu = uuidv4()
-                    const storageRef = ref(storage, `files/${file.name}${uu}`)
+                    const storageRef = ref(storage, `files/${file.name}_${postid}`)
                     uploadBytes(storageRef, file).then(async (snapshot) => {
                         const refFire = doc(db, "posts", postid)
                         getDownloadURL(storageRef)
                             .then((url) => {
-                                console.log("get download", url)
                                 posts.push({ filename: file.name, ...file, url: url, id: uuidv4() });
                                 setDoc(refFire, {
                                     title: title,
                                     status: "Submitted",
                                     id: postid,
                                     comments: [],
-                                    // files: {
-                                    //     Submitted: [...posts],
-                                    // },
                                     userId: auth.currentUser?.uid,
                                     labels: ['Submitted'],
                                     username: auth.currentUser?.displayName,

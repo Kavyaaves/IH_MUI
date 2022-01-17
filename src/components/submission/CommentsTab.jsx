@@ -11,7 +11,6 @@ const CommentsTab = ({ postId }) => {
 
     const handleCommentSend = async (e) => {
         e.preventDefault()
-
         addDoc(collection(db, "posts", postId, "comments"), {
             userView: false,
             senderId: auth.currentUser?.uid,

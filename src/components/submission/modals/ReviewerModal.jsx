@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 import ArrowForward from '@mui/icons-material/ArrowForward';
 import Person from '@mui/icons-material/Person';
 import { Link, Redirect } from 'react-router-dom';
-import { db } from '../../database';
+import { db } from '../../../database';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
 import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';

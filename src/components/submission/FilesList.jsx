@@ -2,7 +2,7 @@ import { Delete } from '@mui/icons-material';
 import { Button, Dialog, IconButton, Paper, Stack } from '@mui/material';
 import { makeStyles, styled } from '@mui/styles';
 import { arrayUnion, collection, doc, onSnapshot, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
 import { db, storage } from '../../database';
@@ -11,20 +11,13 @@ import DriveFileMoveIcon from '@mui/icons-material/DriveFileMove';
 import { v4 as uuidv4 } from "uuid"
 import DeleteSureModal from '../common/DeleteSureModal';
 import NewTab from "./NewTab"
-const FilesList = ({ tab, postId, id, file }) => {
+import MoveFilesModals from "./modals/MoveFilesModals"
+
+const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
     const classes = useStyles()
-    const [files, setFiles] = useState([])
-    const [selected, setSelected] = useState([]);
     const [deleteFileModal, setDeleteFileModal] = useState(false)
     const [moveFileModal, setMoveFileModal] = useState(false)
     const [newTabModal, setNewTabModal] = useState(false)
-
-    // useEffect(async () => {
-    //     const unsubscribe = await onSnapshot(doc(db, "posts", postId, "files", id), (querySnapshot) => {
-    //         console.log(querySnapshot.data())
-    //     });
-    //     return () => unsubscribe()
-    // }, [])
     const handleClose = () => {
         setSelected([])
         setDeleteFileModal(false)
@@ -36,15 +29,16 @@ const FilesList = ({ tab, postId, id, file }) => {
     const deleteSelected = async () => {
         if (selected?.length > 0) {
             const refFire = doc(db, "posts", postId, "files", id)
-            selected.forEach((id) => {
-                setDoc(refFire, {
-                    // [tab]: arrayRemove()
-                }, { merge: true })
+            selected.forEach((fil) => {
+                deleteObject(ref(storage, "files/" + fil.filename + "_" + postId)).then(() => {
+                    setDoc(refFire, {
+                        [tab]: file?.filter(f => f.id == fil.id)
+                    }, { merge: true }).then(() => {
+                        setDeleteFileModal(false)
+                    })
+                })
             })
         }
-    }
-    const moveSelected = async () => {
-
     }
     const columns = [
         {
@@ -70,13 +64,12 @@ const FilesList = ({ tab, postId, id, file }) => {
             // numeric: true,
             disablePadding: false,
             label: 'Download',
-            render: (row) => < >
-                <a href={row?.url}>
+            render: (row) => <>
+                <a href={row?.url} download={row?.filename} >
                     Download
                 </a>
             </>
         },
-
         {
             id: 'id',
             // numeric: true,
@@ -88,7 +81,7 @@ const FilesList = ({ tab, postId, id, file }) => {
                         color="primary"
                         onClick={(e) => {
                             e.preventDefault();
-                            setSelected([row?.id])
+                            setSelected([row])
                             setDeleteFileModal(true)
                         }}>
                         <Delete />
@@ -97,7 +90,7 @@ const FilesList = ({ tab, postId, id, file }) => {
                         color="primary"
                         onClick={(e) => {
                             e.preventDefault();
-                            setSelected([row?.id])
+                            setSelected([row])
                             setMoveFileModal(true)
                         }}>
                         <DriveFileMoveIcon />
@@ -114,10 +107,9 @@ const FilesList = ({ tab, postId, id, file }) => {
         if (files?.length > 0)
             try {
                 files?.map((file) => {
-                    const storageRef = ref(storage, `files/${file.name}_${uuidv4()}`)
+                    const storageRef = ref(storage, `files/${file.name}_${postId}`)
                     uploadBytes(storageRef, file).then(async (snapshot) => {
                         const refFire = doc(db, "posts", postId, "files", id)
-                        const docRef = doc(db, "posts", postId)
                         getDownloadURL(storageRef)
                             .then((url) => {
                                 setDoc(refFire, {
@@ -160,6 +152,7 @@ const FilesList = ({ tab, postId, id, file }) => {
             {file?.length > 0 && <TableCustom
                 headCells={columns}
                 rows={file}
+                tab={tab}
                 selected={selected}
                 setSelected={setSelected}
             />}
@@ -173,8 +166,13 @@ const FilesList = ({ tab, postId, id, file }) => {
                 />
             }
             {moveFileModal &&
-                <DeleteSureModal
+                <MoveFilesModals
+                    postId={postId}
                     title="Move File(s)"
+                    files={file}
+                    id={id}
+                    currTab={tab}
+                    selected={selected}
                     msg={`Are you sure you want to move ${selected?.length > 1 ? selected?.length + " files " : "1 file "} from ${tab}?`}
                     isVisible={moveFileModal}
                     onClose={handleMoveClose}

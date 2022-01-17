@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom'
 import TableCustom from "../common/TableCustom"
 import { Button, IconButton } from '@mui/material'
 import { Delete } from '@mui/icons-material'
-import ReviewerModal from './ReviewerModal'
+import ReviewerModal from './modals/ReviewerModal'
 
 const AllSubmissions = () => {
     const classes = useStyles()

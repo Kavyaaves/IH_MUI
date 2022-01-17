@@ -6,9 +6,8 @@ import { db } from '../../database'
 import { AppBar, Box, Button, Tab, Tabs, Typography } from '@mui/material'
 import { makeStyles } from '@mui/styles'
 import FilesList from './FilesList'
-import CommentsAccordian from './CommentsAccordian'
 import CommentsList from './CommentsList'
-import CommentsTab from './CommentsTab'
+
 const SubmissionFiles = () => {
     const { postId } = useParams()
     const [document, setDocument] = useState([])
@@ -17,6 +16,7 @@ const SubmissionFiles = () => {
     const [labels, setLabels] = useState([])
     const [comments, setComments] = React.useState([])
     const [show, setShow] = React.useState(false)
+    const [selected, setSelected] = useState([]);
 
     const classes = useStyles()
     useEffect(async () => {
@@ -46,7 +46,9 @@ const SubmissionFiles = () => {
         });
         return () => unsubscribe()
     }, [])
-
+    useEffect(() => {
+        setSelected([])
+    }, [key])
     return (
         <>
             <AppBar position='static' className={classes.appBar}>
@@ -64,15 +66,13 @@ const SubmissionFiles = () => {
                         <Tab label={tab} {...a11yProps(i)} value={tab} key={i} />
                     )}
                 </Tabs>
-
             </AppBar>
             <TabPanel value={key} index={key}>
-                <FilesList tab={key} postId={postId} id={id} file={document[key]} />
+                <FilesList tab={key} postId={postId} id={id} file={document[key]} selected={selected} setSelected={setSelected} />
             </TabPanel>
             <Button variant="contained" onClick={() => setShow(!show)}>{show ? "Hide " : "Show "}Comments</Button>
             <br />
-            {show &&
-                <CommentsList postId={postId} />}
+            {show && <CommentsList postId={postId} />}
         </>
     )
 }
