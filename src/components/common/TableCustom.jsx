@@ -248,7 +248,7 @@ export default function EnhancedTable({ rows, headCells, selected, setSelected, 
         setPage(0);
     };
 
-    const isSelected = (name) => selected?.indexOf(name) !== -1;
+    // const isSelected = (id) => selected?.indexOf(id) !== -1;
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
@@ -278,22 +278,22 @@ export default function EnhancedTable({ rows, headCells, selected, setSelected, 
                             {stableSort(rows, getComparator(order, orderBy))
                                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                                 .map((row, index) => {
-                                    const isItemSelected = isSelected(row);
+                                    // const isItemSelected = isSelected(row);
                                     const labelId = `enhanced-table-checkbox-${index}`;
                                     return (
                                         <TableRow
                                             hover
                                             role="checkbox"
-                                            aria-checked={isItemSelected == row?.id}
+                                            // aria-checked={isItemSelected == row?.id}
                                             tabIndex={-1}
                                             key={row.id}
-                                            selected={isItemSelected == row.id}
+                                        // selected={ro}
                                         >
                                             <TableCell padding="checkbox" >
                                                 <Checkbox
                                                     onClick={(event) => handleClick(event, row)}
                                                     color="primary"
-                                                    checked={isItemSelected}
+                                                    checked={selected.map(s => s?.id)?.includes(row?.id)}
                                                     inputProps={{
                                                         'aria-labelledby': labelId,
                                                     }}

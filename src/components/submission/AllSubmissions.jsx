@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Paper from '@mui/material/Paper'
 import makeStyles from '@mui/styles/makeStyles'
 import Typography from '@mui/material/Typography'
-import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore'
-import { db } from '../../database'
+import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, query, where } from 'firebase/firestore'
+import { db, storage } from '../../database'
 import { Link } from 'react-router-dom'
 import TableCustom from "../common/TableCustom"
 import { Button, IconButton } from '@mui/material'
 import { Delete } from '@mui/icons-material'
 import ReviewerModal from './modals/ReviewerModal'
+import { deleteObject, ref } from 'firebase/storage'
 
 const AllSubmissions = () => {
     const classes = useStyles()
@@ -27,11 +28,22 @@ const AllSubmissions = () => {
         });
         return () => unsubscribe()
     }, [])
-    const getReviewer = async (r) => {
-        return await getDoc(doc(db, "users", r.reviewerId))
-            .then((doc) => doc.data())
-            .catch((err) => console.log(err))
+
+    const deletePaper = async (post) => {
+        // getDocs(collection(db, "posts", post?.id, "files")).then(snap => {
+        //     snap.forEach((doc) => {
+        //         post?.labels?.map((label) => {
+        //             doc.data().map((file) => {
+        //                 deleteObject(storage, "files/" + file.filename + "_" + post.id).then(() => {
+        //                     alert("Download successful")
+        //                 })
+        //             })
+        //         })
+        //     })
+        // })
+        // await deleteDoc(doc(db, "posts", post.id))
     }
+
     const columns = [
         {
             id: 'id',
@@ -71,12 +83,20 @@ const AllSubmissions = () => {
             // numeric: true,
             disablePadding: false,
             label: 'Reviewer',
-            render: (row) => <span>{row?.reviewerId ? getReviewer(row) :
-
-                <Button variant="outlined" onClick={() => setReviewerModal(true)}>
-                    Assign
-                </Button>
-            }</span>
+            render: (row) => {
+                return (
+                    <span> {
+                        row?.reviewerId ? row?.reviewerId :
+                            <Button variant="outlined" onClick={
+                                () => {
+                                    setSelected([row])
+                                    setReviewerModal(true)
+                                }
+                            }>
+                                Assign
+                            </Button >
+                    }</span>)
+            }
         },
         {
             id: 'id',
@@ -92,7 +112,8 @@ const AllSubmissions = () => {
                         }}
                         onClick={(e) => {
                             e.preventDefault();
-                            // deletePost(post);
+                            setSelected([row])
+                            // deletePaper(row);
                         }}>
                         <Delete />
                     </IconButton>
@@ -100,15 +121,6 @@ const AllSubmissions = () => {
         },
     ];
 
-    const selectors = [
-        ,
-        (row) => <span>{row?.username}</span>,
-        // (row) => <span>{row.title}</span>,
-        // (row) => <span>{row.title}</span>,
-
-    ]
-
-    console.log(submissions, columns)
     return (
         <Paper elevation={4} className={classes.paper}>
             <Typography variant='h6' className={classes.title}>
@@ -118,7 +130,7 @@ const AllSubmissions = () => {
             <div style={{ minHeight: 400, width: '100%' }}>
                 <TableCustom rows={submissions} headCells={columns} selected={selected} setSelected={setSelected} />
             </div>
-            {reviewerModal && <ReviewerModal isVisible={reviewerModal} onClose={() => setReviewerModal(false)} />}
+            {reviewerModal && <ReviewerModal isVisible={reviewerModal} rev={selected} onClose={() => setReviewerModal(false)} />}
         </Paper>
     )
 }

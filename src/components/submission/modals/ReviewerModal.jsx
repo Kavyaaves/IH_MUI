@@ -15,16 +15,14 @@ import { Link, Redirect } from 'react-router-dom';
 import { db } from '../../../database';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
-import { collection, getDocs, onSnapshot, query, where } from 'firebase/firestore';
-import { DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import { CheckBox } from '@mui/icons-material';
+import { arrayUnion, collection, doc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { Checkbox, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
-const ReviewerModal = ({ isVisible, onClose }) => {
+const ReviewerModal = ({ isVisible, onClose, rev }) => {
     const [reviewers, setReviewers] = useState([])
     const classes = useStyles()
-    const [isItemSelected, setIsItemSelected] = useState(undefined)
+    const [selected, setSelected] = useState([])
     useEffect(async () => {
-
         const q = query(collection(db, "users"), where("role", "==", "Reviewer"))
         const unsubscribe = await onSnapshot(q, (querySnapshot) => {
             const cities = [];
@@ -36,94 +34,82 @@ const ReviewerModal = ({ isVisible, onClose }) => {
         });
         return () => unsubscribe()
     }, [])
-    const handleClick = (row) => {
-        setIsItemSelected(row?.id)
+    const handleClick = (e, item) => {
+        if (e.target.checked)
+            setSelected([item])
+        else
+            setSelected([])
+    }
+    const assignToReviewer = async () => {
+        debugger
+        if (selected[0]?.id && rev) {
+            setDoc(doc(db, "posts", rev[0]?.id), {
+                reviewerId: selected[0]?.id,
+                status: "Under Review"
+            }, { merge: true }).then(() => {
+                alert("success")
+            })
+        }
     }
     return (
         <Dialog open={isVisible} onClose={onClose}
             onBackdropClick={onClose} fullWidth="md" maxWidth="md"
         >
-            <Paper className={classes.paper}>
-                <DialogTitle
-                    variant='h6'
-                    style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                    Choose a Reviewer
-                </DialogTitle>
-                <br />
-                {/* Total: {reviewers?.length} */}
-                {/* {open && (
-                <Dialog
-                    open={open}
-                    onClose={() => {
-                        setRedirect(true);
-                    }}>
-                    <Dialogue
-                        open={open}
-                        handleOpen={setOpen}
-                        title='Sent to Reviewer'
-                        msg='The paper is successfully alotted to the reviewer'
-                    />
-                </Dialog>
-            )} */}
-                <DialogContent dividers={true} style={{ minHeight: '55vh' }}>
-                    <List className={classes.list} dense>
-                        {reviewers?.length !== 0 &&
-                            reviewers?.map((item, i) => {
-                                return (
-                                    <ListItem
-                                        // button
-                                        key={i}
-                                        style={
-                                            // item === rev
-                                            // ? { backgroundColor: '#ededed' }
-                                            // :
-                                            { backgroundColor: '#fff' }
-                                        }
-                                    >
-                                        <CheckBox
-                                            onChange={(e) => setIsItemSelected(e.target.checked)}
-                                            color="primary"
-                                            style={{ marginRight: 15 }}
-                                            checked={isItemSelected}
-                                            inputProps={{
-                                                // 'aria-labelledby': labelId,
-                                            }}
-                                        />
-                                        <ListItemAvatar>
-                                            <Avatar src={item?.imageUrl}>
-                                                <Person />
-                                            </Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText primary={item?.displayName} />
-                                        <ListItemSecondaryAction>
-                                            {/* <Link to={'/user/' + item.id} key={i}> */}
-                                            <IconButton>
-                                                <ArrowForward />
-                                            </IconButton>
-                                            {/* </Link> */}
-                                        </ListItemSecondaryAction>
-                                    </ListItem>
-                                );
-                            })}
-                    </List>
-                </DialogContent>
-                <br />
-                <DialogActions className={classes.buttonDiv}>
-                    {/* {rev && ( */}
-                    <Button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            // handleSubmit(rev);
-                        }}
-                        variant='contained'
-                        style={{ margin: 'auto' }}
-                        color='primary'
-                        disabed={true}>
-                        Send to Reviewer
-                    </Button>
-                    {/* )} */}
-                </DialogActions>
-            </Paper>
+            <DialogTitle
+                variant='h6'
+                style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                Choose a Reviewer
+            </DialogTitle>
+            <br />
+            <DialogContent dividers={true} style={{ minHeight: '55vh' }}>
+                <List className={classes.list} dense>
+                    {reviewers?.length !== 0 &&
+                        reviewers?.map((item, i) => {
+                            return (
+                                <ListItem key={i}>
+                                    <Checkbox
+                                        onChange={(e) => handleClick(e, item)}
+                                        color="primary"
+                                        style={{ marginRight: 15 }}
+                                        checked={selected[0]?.id == item?.id}
+                                        inputProps={{
+                                            'aria-labelledby': "controlled",
+                                        }}
+                                    />
+                                    <ListItemAvatar>
+                                        <Avatar src={item?.imageUrl} alt={item?.displayName}>
+                                            <Person />
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText primary={item?.displayName} />
+                                    <ListItemSecondaryAction>
+                                        {/* <Link to={'/user/' + item.id} key={i}> */}
+                                        <IconButton>
+                                            <ArrowForward />
+                                        </IconButton>
+                                        {/* </Link> */}
+                                    </ListItemSecondaryAction>
+                                </ListItem>
+                            );
+                        })}
+                </List>
+            </DialogContent>
+            <br />
+            <DialogActions className={classes.buttonDiv}>
+                {/* {rev && ( */}
+                <Button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        assignToReviewer();
+                    }}
+                    variant='contained'
+                    style={{ margin: 'auto' }}
+                    color='primary'
+                    disabed={true}>
+                    Send to Reviewer
+                </Button>
+                {/* )} */}
+            </DialogActions>
         </Dialog >
     )
 }
