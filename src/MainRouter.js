@@ -13,6 +13,7 @@ import Archives from './components/archives/AllArchives';
 import AllSubmissions from './components/submission/AllSubmissions';
 import SubmissionFiles from './components/submission/SubmissionFiles';
 import TrackSubmissions from './components/track/TrackSubmissions';
+import PrivateRoute from './components/auth/PrivateRoute';
 
 // import SubmitPaper from './components/submitPaper/SubmitPaper';
 // import Submissions from './components/submitPaper/Submissions';
@@ -28,16 +29,44 @@ function MainRouter() {
         <div>
             {/* <TitleCard /> */}
             <Routes>
+                {/* <PrivateRoute
+                    path='/user/:userId'
+                    // component={Profile}
+                    exact={true}
+                /> */}
                 <Route path="/" exact element={<Home />} />
-                <Route path="/submit-paper" exact element={<SubmitPaper />} />
-                <Route path="/my-profile" exact element={<SubmitPaper />} />
+
+                <Route path="/submit-paper" element={
+                    <PrivateRoute>
+                        <SubmitPaper />
+                    </PrivateRoute>
+                } />
+                <Route path="/my-profile" exact element={
+                    <PrivateRoute>
+                        <SubmitPaper />
+                    </PrivateRoute>
+                } />
                 <Route path="/instructions" exact element={<InstructionsForAuthors />} />
                 <Route path="/editorial" exact element={<EditorialBoard />} />
                 <Route path="/feedback" exact element={<FeedbackPage />} />
                 <Route path="/archives" exact element={<Archives />} />
-                <Route path="/submissions" exact element={<AllSubmissions />} />
-                <Route path="/submissions/:postId" exact element={<SubmissionFiles />} />
-                <Route path="/track-submissions" exact element={<TrackSubmissions />} />
+                <Route path="/submissions" exact element={
+                    <PrivateRoute>
+                        <AllSubmissions />
+                    </PrivateRoute>
+                } />
+                <Route path="/submissions/:postId" exact element={
+                    <PrivateRoute>
+                        <SubmissionFiles />
+                    </PrivateRoute>
+                } />
+                <Route path="/track-submissions" exact element={
+                    <PrivateRoute>
+                        <TrackSubmissions />
+                    </PrivateRoute>
+                } />
+                <Route exact path="*" element={
+                    <TrackSubmissions />} />
                 {/* <Route path="/signup" exact component={Signup} />
                 <Route path="/submissions" exact component={Submissions} />
                 <Route path="/submissions/:id" exact component={SubmissionFiles} />

@@ -12,9 +12,9 @@ const MenuEnd = ({ handleClick }) => {
 
     return (
         <div>
-            {isAuthenticated ?
+            {user ?
                 <IconButton sx={{ p: 0 }} onClick={handleClick('bottom-end')}>
-                    <Avatar alt="Remy Sharp" src="/" />
+                    <Avatar alt={user?.displayName} src="/" />
                 </IconButton>
                 :
                 <ButtonGroup variant="outlined" color="secondary" aria-label="outlined button group">

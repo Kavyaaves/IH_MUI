@@ -7,16 +7,21 @@ import { auth } from '../../database';
 import { signOut } from 'firebase/auth';
 
 const AvatarPopup = ({ setOpen }) => {
-    const history = useNavigate()
+    const navigate = useNavigate()
     const handleLogout = (e) => {
         e.preventDefault();
-        signOut(auth);
-        setOpen(false)
+        signOut(auth).then(() => {
+            // Sign-out successful.
+            navigate("/", { replace: true });
+            setOpen(false)
+        }).catch((error) => {
+            // An error happened.
+        });
     }
     const handleProfileLink = (e) => {
         e.preventDefault();
         setOpen(false)
-        history("/my-profile")
+        navigate("/my-profile")
     }
     return (
         <List>
