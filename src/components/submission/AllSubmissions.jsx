@@ -9,7 +9,7 @@ import TableCustom from "../common/TableCustom"
 import { Button, IconButton } from '@mui/material'
 import { Delete } from '@mui/icons-material'
 import ReviewerModal from './modals/ReviewerModal'
-import { deleteObject, ref } from 'firebase/storage'
+import { deleteObject, ref, listAll } from 'firebase/storage'
 
 const AllSubmissions = () => {
     const classes = useStyles()
@@ -29,19 +29,20 @@ const AllSubmissions = () => {
         return () => unsubscribe()
     }, [])
 
+
     const deletePaper = async (post) => {
-        // getDocs(collection(db, "posts", post?.id, "files")).then(snap => {
-        //     snap.forEach((doc) => {
-        //         post?.labels?.map((label) => {
-        //             doc.data().map((file) => {
-        //                 deleteObject(storage, "files/" + file.filename + "_" + post.id).then(() => {
-        //                     alert("Download successful")
-        //                 })
-        //             })
-        //         })
-        //     })
-        // })
-        // await deleteDoc(doc(db, "posts", post.id))
+        const folderRef = ref(storage, "files/" + post.id)
+        const promises = []
+        listAll(folderRef)
+            .then(async (res) => {
+                res.items.forEach((itemRef) => {
+                    promises.push(deleteObject(itemRef))
+                });
+                promises.push(deleteDoc(doc(db, "posts", post.id)))
+            }).catch((error) => {
+                console.log(error);
+            });
+        await Promise.all(promises)
     }
 
     const columns = [
@@ -113,7 +114,7 @@ const AllSubmissions = () => {
                         onClick={(e) => {
                             e.preventDefault();
                             setSelected([row])
-                            // deletePaper(row);
+                            deletePaper(row);
                         }}>
                         <Delete />
                     </IconButton>
@@ -122,16 +123,22 @@ const AllSubmissions = () => {
     ];
 
     return (
-        <Paper elevation={4} className={classes.paper}>
+        <>
             <Typography variant='h6' className={classes.title}>
                 Submissions
             </Typography>
             <br />
             <div style={{ minHeight: 400, width: '100%' }}>
-                <TableCustom rows={submissions} headCells={columns} selected={selected} setSelected={setSelected} />
+                {submissions?.length > 0 ?
+                    <TableCustom rows={submissions} headCells={columns} selected={selected} setSelected={setSelected} /> :
+                    <Paper sx={{ padding: 5 }}>
+                        <Typography variant='h6' align='center'>No records found</Typography>
+                    </Paper>
+
+                }
             </div>
             {reviewerModal && <ReviewerModal isVisible={reviewerModal} rev={selected} onClose={() => setReviewerModal(false)} />}
-        </Paper>
+        </>
     )
 }
 

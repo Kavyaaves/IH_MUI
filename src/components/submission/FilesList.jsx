@@ -30,9 +30,9 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
         if (selected?.length > 0) {
             const refFire = doc(db, "posts", postId, "files", id)
             selected.forEach((fil) => {
-                deleteObject(ref(storage, "files/" + fil.filename + "_" + postId)).then(() => {
+                deleteObject(ref(storage, "files/" + postId + "/" + file.name + "_" + file.id)).then(() => {
                     setDoc(refFire, {
-                        [tab]: file?.filter(f => f.id == fil.id)
+                        [tab]: file?.filter(f => f.id != fil.id)
                     }, { merge: true }).then(() => {
                         setDeleteFileModal(false)
                     })
@@ -46,7 +46,7 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
             // numeric: true,
             disablePadding: false,
             label: 'File Name',
-            render: (row) => < >{row?.filename}</>
+            render: (row) => < >{row?.name}</>
         },
         {
             id: 'id',
@@ -65,7 +65,7 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
             disablePadding: false,
             label: 'Download',
             render: (row) => <>
-                <a href={row?.url} download={row?.filename} >
+                <a href={row?.url} download={row?.name} >
                     Download
                 </a>
             </>
@@ -107,14 +107,20 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
         if (files?.length > 0)
             try {
                 files?.map((file) => {
-                    const storageRef = ref(storage, `files/${file.name}_${postId}`)
+                    const uu = uuidv4()
+                    const storageRef = ref(storage, `files/${postId}/${file.name}_${uu}`)
                     uploadBytes(storageRef, file).then(async (snapshot) => {
                         const refFire = doc(db, "posts", postId, "files", id)
                         getDownloadURL(storageRef)
                             .then((url) => {
                                 setDoc(refFire, {
-                                    [tab]: arrayUnion({ filename: file?.name, url: url, id: uuidv4(), ...file })
-                                }, { merge: true })
+                                    [tab]: arrayUnion({
+                                        name: file.name,
+                                        url, id: uu, size: file.size,
+                                        lastModifiedDate: file.lastModifiedDate,
+                                        type: file.type
+                                    })
+                                }, { merge: true }).catch((err) => console.log(err))
                             })
                             .catch((err) => {
                                 console.log(err)

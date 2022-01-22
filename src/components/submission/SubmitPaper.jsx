@@ -15,7 +15,7 @@ import { Link, Redirect } from 'react-router-dom';
 import Dropzone from 'react-dropzone';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { createStyles, makeStyles } from '@mui/styles';
-import { addDoc, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { addDoc, arrayUnion, collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { db, storage, auth } from '../../database';
 import { UserContext } from '../../providers/UserProvider';
@@ -54,14 +54,21 @@ const SubmitPaper = () => {
             try {
                 let t = serverTimestamp()
                 console.log(t)
+                let docid = uuidv4()
                 files?.map((file) => {
+                    console.log(file);
                     const uu = uuidv4()
-                    const storageRef = ref(storage, `files/${file.name}_${postid}`)
+                    const storageRef = ref(storage, `files/${postid}/${file.name}_${uu}`)
                     uploadBytes(storageRef, file).then(async (snapshot) => {
                         const refFire = doc(db, "posts", postid)
                         getDownloadURL(storageRef)
-                            .then((url) => {
-                                posts.push({ filename: file.name, ...file, url: url, id: uuidv4() });
+                            .then(async (url) => {
+                                posts?.push({
+                                    name: file.name,
+                                    url: url, id: uu, size: file.size,
+                                    lastModifiedDate: file.lastModifiedDate,
+                                    path: file.path, type: file.type
+                                })
                                 setDoc(refFire, {
                                     title: title,
                                     status: "Submitted",
@@ -74,13 +81,13 @@ const SubmitPaper = () => {
                                 },
                                     { merge: true }
                                 );
-                                const subRef = collection(db, "posts", postid, "files")
-                                addDoc(subRef, {
-                                    Submitted: [...posts],
+                                setDoc(doc(db, "posts", postid, "files", docid), {
+                                    Submitted: [...posts]
                                 })
                                 setFiles([])
                                 setFileNames([])
                                 setTitle("")
+                                setFormValidated(false)
                             })
                             .catch((err) => {
                                 console.log(err)

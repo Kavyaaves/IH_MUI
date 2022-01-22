@@ -8,25 +8,37 @@ import React from 'react'
 import { db } from '../../database'
 import CommentsList from '../submission/CommentsList';
 
-const FilesListUserView = ({ postId, files }) => {
-
+const FilesListUserView = ({ postId }) => {
+    const [files, setFiles] = React.useState([])
+    React.useEffect(async () => {
+        const unsubscribe = await onSnapshot(collection(db, "posts", postId, "files"), (querySnapshot) => {
+            let f = []
+            querySnapshot.forEach(file => {
+                f.push(file.data())
+            })
+            setFiles(f[0])
+        })
+        return () => unsubscribe()
+    }, [])
     const steps = [
         "Submitted", "Under Review", "Completed"
     ]
+    console.log("f", files);
     return (
         <div>
-            <Typography variant='body2'>
-                {files?.Submitted.length > 0 ?
-                    files?.Submitted?.map((file, i) => (
-                        <a
-                            href={file.url}
-                            target='_blank'
-                            download={file.filename}
-                            rel='noreferrer'
-                            key={i}>
-                            <Typography key={i}>{file.filename}</Typography>
-                        </a>
-                    )) : <Typography align="center" variant='body1'>No files submitted</Typography>}
+            <Typography variant='subtitle1'>
+                <br />
+                {files?.Submitted?.map((file, i) => (
+                    <a
+                        className="link_dark"
+                        href={file.url}
+                        target='_blank'
+                        download={file.name}
+                        rel='noreferrer'
+                        key={i}>
+                        <Typography key={i} variant="body2">{file.name}</Typography>
+                    </a>))}
+                {/* // )) : <Typography align="center" variant='body1'>No files submitted</Typography>} */}
             </Typography>
             <br />
             <Box sx={{ width: '100%' }}>

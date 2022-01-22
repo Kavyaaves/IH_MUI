@@ -61,40 +61,6 @@ function stableSort(array, comparator) {
     });
     return stabilizedThis.map((el) => el[0]);
 }
-
-// const headCells = [
-//     {
-//         id: 'title',
-//         numeric: false,
-//         disablePadding: true,
-//         // label: 'Dessert (100g serving)',
-//     },
-//     {
-//         id: 'calories',
-//         numeric: true,
-//         disablePadding: false,
-//         label: 'Calories',
-//     },
-//     {
-//         id: 'fat',
-//         numeric: true,
-//         disablePadding: false,
-//         label: 'Fat (g)',
-//     },
-//     {
-//         id: 'carbs',
-//         numeric: true,
-//         disablePadding: false,
-//         label: 'Carbs (g)',
-//     },
-//     {
-//         id: 'protein',
-//         numeric: true,
-//         disablePadding: false,
-//         label: 'Protein (g)',
-//     },
-// ];
-
 function EnhancedTableHead(props) {
     const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
         props;
@@ -257,9 +223,9 @@ export default function EnhancedTable({ rows, headCells, selected, setSelected, 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <TableContainer>
+                <TableContainer style={{ minHeight: "20vh" }}>
                     <Table
-                        sx={{ minWidth: 750 }}
+                        sx={{ minWidth: 750, }}
                         aria-labelledby="tableTitle"
                         size={'medium'}
                     >

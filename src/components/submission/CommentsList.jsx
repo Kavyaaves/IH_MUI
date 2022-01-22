@@ -9,10 +9,17 @@ import CommentsTab from './CommentsTab'
 
 const CommentsList = ({ postId, }) => {
     const classes = useStyles()
-
+    const [user, setUser] = React.useState({})
+    const [authy, setAuthy] = React.useState({})
     const deleteComment = async (item) => {
         await deleteDoc(doc(db, "posts", postId, "comments", item.id))
     }
+    React.useEffect(async () => {
+        await onSnapshot(doc(db, "users", auth.currentUser?.uid), (querySnapshot) => {
+            console.log(querySnapshot.data());
+            setAuthy(querySnapshot.data())
+        })
+    }, [])
     const [comments, setComments] = React.useState([])
     React.useEffect(async () => {
         const unsubscribe = await onSnapshot(collection(db, "posts", postId, "comments"), (querySnapshot) => {
@@ -25,6 +32,16 @@ const CommentsList = ({ postId, }) => {
         });
         return () => unsubscribe()
     }, [])
+
+    const updateComments = async (id, val) => {
+        await setDoc(doc(db, "posts", postId, "comments", id), {
+            userView: val
+        }, { merge: true }).then(() => {
+            alert("success")
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
     return (
         <Paper elevation={4} style={{ padding: 20, marginTop: 20 }}>
             <Stack direction="column" style={{ maxHeight: "100vh", overflowY: "scroll" }}>
@@ -32,7 +49,7 @@ const CommentsList = ({ postId, }) => {
                 {comments?.map((item) => {
                     return (
                         <CardContent className={classes.cardContent}>
-                            <Typography variant='body2' className={item?.senderId == auth.currentUser.uid ? classes.commentRight : classes.commentLeft}>
+                            <Typography variant='body2' className={item?.senderId == auth.currentUser?.uid ? classes.commentRight : classes.commentLeft}>
                                 <div className={classes.tot}>
                                     <div className={classes.userDiv}>
                                         <div
@@ -42,7 +59,7 @@ const CommentsList = ({ postId, }) => {
                                             <Avatar
                                                 size="small"
                                                 className={classes.smallAvatar}
-                                                alt={item?.sender?.name}
+                                                alt={item?.sender?.displayName}
                                                 src={item.imageUrl}
                                             />
                                             &nbsp;&nbsp;&nbsp;
@@ -70,30 +87,30 @@ const CommentsList = ({ postId, }) => {
                                             })}
                                     </span>
                                     <div>
-                                        {/* {user.role === 'Admin' && item.userView === false && ( */}
-                                        <Tooltip title='Unlocked'>
-                                            <IconButton
-                                                style={{ color: '#fff' }}
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    // updateComments(item.id, false);
-                                                }}>
-                                                <LockOpen />
-                                            </IconButton>
-                                        </Tooltip>
-                                        {/* )} */}
-                                        {/* {( */}
-                                        <Tooltip title='Locked'>
-                                            <IconButton
-                                                style={{ color: '#fff' }}
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    // updateComments(item.id, true);
-                                                }}>
-                                                <Lock />
-                                            </IconButton>
-                                        </Tooltip>
-                                        {/* )} */}
+                                        {authy.role === 'Admin' && item.userView === true && (
+                                            <Tooltip title='Unlocked'>
+                                                <IconButton
+                                                    style={{ color: '#fff' }}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        updateComments(item.id, false);
+                                                    }}>
+                                                    <LockOpen />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
+                                        {authy.role === 'Admin' && item.userView === false && (
+                                            <Tooltip title='Locked'>
+                                                <IconButton
+                                                    style={{ color: '#fff' }}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        updateComments(item.id, true);
+                                                    }}>
+                                                    <Lock />
+                                                </IconButton>
+                                            </Tooltip>
+                                        )}
                                         {/* { */}
                                         <IconButton
                                             className={classes.commentDelete}

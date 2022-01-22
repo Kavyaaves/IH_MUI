@@ -48,11 +48,11 @@ const ListLeft = () => {
                 </ListItem>
             </Link>
             <Divider />
-            {auth.currentUser && <Link className="link" to="/track-submissions">
+            <Link className="link" to="/track-submissions">
                 <ListItem button>
                     <ListItemText primary='Track Submissions' />
                 </ListItem>
-            </Link>}
+            </Link>
             <Divider />
             <Link className="link" to='/membership'>
                 <ListItem button>

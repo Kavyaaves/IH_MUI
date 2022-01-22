@@ -47,7 +47,11 @@ const ReviewerModal = ({ isVisible, onClose, rev }) => {
                 reviewerId: selected[0]?.id,
                 status: "Under Review"
             }, { merge: true }).then(() => {
-                alert("success")
+                setDoc(doc(db, "users", selected[0]?.id), {
+                    pendingReviews: arrayUnion(rev[0]?.id)
+                }, { merge: true }).then(() => {
+                    alert("Success")
+                })
             })
         }
     }

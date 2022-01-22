@@ -9,14 +9,14 @@
 *.lock
 # testing
 /coverage
-
+.firebaserc
+firebase-debug.log
 # production
 /build
 
 # misc
 .DS_Store
 .env
-.gitignore
 .env.local
 .env.development.local
 .env.test.local
