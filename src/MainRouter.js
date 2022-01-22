@@ -29,11 +29,6 @@ function MainRouter() {
         <div>
             {/* <TitleCard /> */}
             <Routes>
-                {/* <PrivateRoute
-                    path='/user/:userId'
-                    // component={Profile}
-                    exact={true}
-                /> */}
                 <Route path="/" exact element={<Home />} />
 
                 <Route path="/submit-paper" element={
