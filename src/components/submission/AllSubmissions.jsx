@@ -31,14 +31,14 @@ const AllSubmissions = () => {
 
 
     const deletePaper = async (post) => {
-        const folderRef = ref(storage, "files/" + post.id)
+        const folderRef = ref(storage, "files/" + post.postId)
         const promises = []
         listAll(folderRef)
             .then(async (res) => {
                 res.items.forEach((itemRef) => {
                     promises.push(deleteObject(itemRef))
                 });
-                promises.push(deleteDoc(doc(db, "posts", post.id)))
+                promises.push(deleteDoc(doc(db, "posts", post.postId)))
             }).catch((error) => {
                 console.log(error);
             });
@@ -87,7 +87,14 @@ const AllSubmissions = () => {
             render: (row) => {
                 return (
                     <span> {
-                        row?.reviewerId ? row?.reviewerId :
+                        row?.reviewerId ? <Button variant="outlined" onClick={
+                            () => {
+                                setSelected([row])
+                                setReviewerModal(true)
+                            }
+                        }>
+                            Reassign
+                        </Button > :
                             <Button variant="outlined" onClick={
                                 () => {
                                     setSelected([row])
@@ -96,7 +103,9 @@ const AllSubmissions = () => {
                             }>
                                 Assign
                             </Button >
-                    }</span>)
+                    }</span>
+
+                )
             }
         },
         {

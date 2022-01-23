@@ -62,7 +62,7 @@ const SubmissionFiles = () => {
                     className={classes.tabs}
                     scrollButtons='auto'
                     aria-label='scrollable auto tabs example'>
-                    {labels?.map((tab, i) =>
+                    {Array.from(new Set(labels))?.map((tab, i) =>
                         <Tab label={tab} {...a11yProps(i)} value={tab} key={i} />
                     )}
                 </Tabs>

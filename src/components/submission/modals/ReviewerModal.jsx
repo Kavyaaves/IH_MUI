@@ -15,7 +15,7 @@ import { Link, Redirect } from 'react-router-dom';
 import { db } from '../../../database';
 import Typography from '@mui/material/Typography';
 import { makeStyles } from '@mui/styles';
-import { arrayUnion, collection, doc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { arrayUnion, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { Checkbox, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 const ReviewerModal = ({ isVisible, onClose, rev }) => {
@@ -32,8 +32,17 @@ const ReviewerModal = ({ isVisible, onClose, rev }) => {
             setReviewers(cities)
             return cities
         });
-        return () => unsubscribe()
     }, [])
+    useEffect(async () => {
+        const unsubscribe = await onSnapshot(doc(db, "posts", rev[0]?.id), async (querySnapshot) => {
+            if (querySnapshot.data().reviewerId) {
+                const snap = await getDoc(doc(db, "users", querySnapshot.data()?.reviewerId))
+                setSelected([snap.data()])
+            }
+        });
+        return () => unsubscribe()
+    }, [isVisible])
+    console.log(selected);
     const handleClick = (e, item) => {
         if (e.target.checked)
             setSelected([item])

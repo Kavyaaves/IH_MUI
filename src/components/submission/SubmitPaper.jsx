@@ -45,7 +45,7 @@ const SubmitPaper = () => {
             setFiles(null);
         }
     };
-    console.log(user)
+
     const uploadFile = async (data) => {
         const postid = uuidv4();
         setFormValidated(true)
@@ -74,6 +74,7 @@ const SubmitPaper = () => {
                                     status: "Submitted",
                                     id: postid,
                                     comments: [],
+                                    requestForResubmission: false,
                                     userId: auth.currentUser?.uid,
                                     labels: ['Submitted'],
                                     username: auth.currentUser?.displayName,

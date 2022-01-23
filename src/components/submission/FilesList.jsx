@@ -1,5 +1,5 @@
 import { Delete } from '@mui/icons-material';
-import { Button, Dialog, IconButton, Paper, Stack } from '@mui/material';
+import { Button, Dialog, IconButton, Paper, Stack, ToggleButton } from '@mui/material';
 import { makeStyles, styled } from '@mui/styles';
 import { arrayUnion, collection, doc, onSnapshot, serverTimestamp, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
@@ -18,6 +18,7 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
     const [deleteFileModal, setDeleteFileModal] = useState(false)
     const [moveFileModal, setMoveFileModal] = useState(false)
     const [newTabModal, setNewTabModal] = useState(false)
+    const [requested, setRequested] = useState(false)
     const handleClose = () => {
         setSelected([])
         setDeleteFileModal(false)
@@ -26,6 +27,12 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
         setSelected([])
         setMoveFileModal(false)
     }
+    useEffect(async () => {
+        const unsubscribe = await onSnapshot(doc(db, "posts", postId), (querySnapshot) => {
+            setRequested(querySnapshot.data()?.requestForResubmission)
+        })
+        return () => unsubscribe()
+    }, [postId])
     const deleteSelected = async () => {
         if (selected?.length > 0) {
             const refFire = doc(db, "posts", postId, "files", id)
@@ -131,7 +138,15 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
                 console.log(err)
             }
     }
-    console.log(selected)
+
+    const requestResub = async (id) => {
+        setDoc(doc(db, "posts", postId), {
+            requestForResubmission: !requested
+        }, { merge: true }).then((resub) => {
+
+        })
+    }
+
     return (
         <div>
             <Stack alignItems="center" width="100%" mb={1} direction="row" spacing={2} justifyContent="right">
@@ -145,6 +160,11 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
                         Delete {selected?.length} files
                     </Button>
                 }
+                <ToggleButton
+                    value={requested} size="small"
+                    selected={requested} onClick={() => requestResub(postId)}>
+                    <div style={{ paddingX: 25 }}> {requested ? "Requested" : "Request"} For Resubmission</div>
+                </ToggleButton>
                 <label htmlFor="contained-button-file">
                     <Input id="contained-button-file" multiple type="file" onChange={handleFileChange} className={classes.input} />
                     <Button variant="contained" component="span">
@@ -155,14 +175,17 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
                     New Tab
                 </Button>
             </Stack>
-            {file?.length > 0 && <TableCustom
-                headCells={columns}
-                rows={file}
-                tab={tab}
-                selected={selected}
-                setSelected={setSelected}
-            />}
-            {deleteFileModal &&
+            {
+                file?.length > 0 && <TableCustom
+                    headCells={columns}
+                    rows={file}
+                    tab={tab}
+                    selected={selected}
+                    setSelected={setSelected}
+                />
+            }
+            {
+                deleteFileModal &&
                 <DeleteSureModal
                     title="Delete File(s)"
                     msg={`Are you sure you want to delete ${selected?.length > 1 ? selected?.length + " files" : "1 file"}?`}
@@ -171,7 +194,8 @@ const FilesList = ({ tab, postId, id, file, selected, setSelected }) => {
                     onConfirmation={deleteSelected}
                 />
             }
-            {moveFileModal &&
+            {
+                moveFileModal &&
                 <MoveFilesModals
                     postId={postId}
                     title="Move File(s)"
