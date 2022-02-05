@@ -15,29 +15,25 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import { auth, db } from '../../database';
 import { UserContext } from '../../providers/UserProvider';
+import { addDoc, collection, doc, onSnapshot } from 'firebase/firestore';
+import FeedbackAdmin from './FeedbackAdmin';
 // import FeedbackAdmin from './FeedbackAdmin';
 
 export default function NewPost(props) {
     const classes = useStyles();
     const { user, isAuthenticated } = useContext(UserContext);
-    const [posts, setPosts] = useState([]);
     const [del, setDel] = useState(false);
     const [error, setError] = useState(null);
     const [value, setValue] = useState('');
     const [alert, setAlert] = useState(null);
+    const [userFire, setUserFire] = useState({})
 
-    useEffect(() => {
-        const postData = [];
-        // if (db.collection('feedback'))
-        //     db.collection('feedback').onSnapshot((snapshot) => {
-        //         snapshot.docChanges().forEach((change) => {
-        //             if (change.type === 'added')
-        //                 postData.push({ ...change.doc.data(), id: change.doc.id });
-        //         });
-        //         setPosts(postData);
-        //     });
-    }, []);
-
+    useEffect(async () => {
+        const unsubscribe = await onSnapshot(doc(db, "users", user?.uid), (snapshot) => {
+            setUserFire(snapshot.data());
+        })
+        return () => unsubscribe()
+    }, [user?.uid]);
     const handleChange = (event) => {
         setValue(event.target.value);
     };
@@ -48,14 +44,13 @@ export default function NewPost(props) {
             new Date().toDateString() +
             ' ' +
             new Date().toLocaleTimeString('en-us', { timeZone: 'Asia/Kolkata' });
-        db.collection('feedback')
-            .add({
-                text: value,
-                userId: user?.userId || '',
-                userName: user ? user.displayName : 'Anonymous',
-                imageUrl: user?.imageUrl || '',
-                postedAt: timestamp,
-            })
+        addDoc(collection(db, 'feedback'), {
+            text: value,
+            userId: user?.userId || '',
+            userName: user ? user.displayName : 'Anonymous',
+            imageUrl: user?.imageUrl || '',
+            postedAt: timestamp,
+        })
             .then((doc) => {
                 setValue('');
                 setAlert('Feedback recorded successfully');
@@ -65,13 +60,6 @@ export default function NewPost(props) {
                 setError('Error getting your feedback. Please try again later');
             });
     };
-    const removePost = async (post) => {
-        const index = posts.indexOf(post);
-        console.log(index);
-        posts.splice(index, 1);
-        const waitFor = (ms) => new Promise((r) => setTimeout(r, ms));
-        await waitFor(100);
-    };
 
     return (
         <div className={classes.root}>
@@ -79,7 +67,6 @@ export default function NewPost(props) {
                 <Typography variant='h6' color="primary" style={{ textAlign: 'center' }}>
                     <strong>Feedback</strong>
                 </Typography>
-                <br />
                 {alert && (
                     <Alert
                         severity='success'
@@ -93,11 +80,7 @@ export default function NewPost(props) {
                 <CardHeader
                     avatar={<Avatar src={user?.imageUrl} />}
                     className={classes.cardHeader}
-                    title={
-                        <Typography variant='body1'>
-                            {auth.currentUser ? auth.currentUser?.displayName : 'Anonymous'}
-                        </Typography>
-                    }
+                    title={user ? user?.displayName : 'Anonymous'}
                 />
                 <CardContent className={classes.cardContent}>
                     <TextField
@@ -136,14 +119,14 @@ export default function NewPost(props) {
                 </CardActions>
             </Card>
             <br />
-            {user && user.role === 'Admin' && (
+            {user && userFire.role === 'Admin' && (
                 <Card
                     style={{
                         minHeight: 200,
                         margin: 'auto',
                     }}
                     className={classes.card}>
-                    {/* <FeedbackAdmin posts={posts} removePost={removePost} /> */}
+                    <FeedbackAdmin />
                 </Card>
             )}
 
@@ -179,7 +162,6 @@ const useStyles = makeStyles((theme) => ({
         width: '75%',
     },
     cardHeader: {
-        color: '#fff',
         paddingTop: 5,
         paddingBottom: 5,
         fontSize: 'small',

@@ -109,6 +109,13 @@ const SubmitPaper = () => {
             </Typography>
 
             <CardContent className={classes.cardContent}>
+                {!user && <>
+                    <Alert severity="info">
+                        <AlertTitle>Info</AlertTitle>
+                        Please login to submit your papers
+                    </Alert>
+                    <br />
+                </>}
                 <TextField
                     error={title == "" && formValidated}
                     label="Title"
@@ -174,7 +181,7 @@ const SubmitPaper = () => {
                 <Button
                     color='primary'
                     variant='contained'
-                    // disabled={!user || files?.length === 0}
+                    disabled={!user || files?.length === 0}
                     onClick={uploadFile}
                     type="submit"
                     className={classes.submitButton}>

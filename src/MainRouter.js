@@ -32,33 +32,23 @@ function MainRouter() {
                 <Route path="/" exact element={<Home />} />
 
                 <Route path="/submit-paper" element={
-                    <PrivateRoute>
-                        <SubmitPaper />
-                    </PrivateRoute>
+                    <SubmitPaper />
                 } />
                 <Route path="/my-profile" exact element={
-                    <PrivateRoute>
-                        <SubmitPaper />
-                    </PrivateRoute>
+                    <SubmitPaper />
                 } />
                 <Route path="/instructions" exact element={<InstructionsForAuthors />} />
                 <Route path="/editorial" exact element={<EditorialBoard />} />
                 <Route path="/feedback" exact element={<FeedbackPage />} />
                 <Route path="/archives" exact element={<Archives />} />
                 <Route path="/submissions" exact element={
-                    <PrivateRoute>
-                        <AllSubmissions />
-                    </PrivateRoute>
+                    <AllSubmissions />
                 } />
                 <Route path="/submissions/:postId" exact element={
-                    <PrivateRoute>
-                        <SubmissionFiles />
-                    </PrivateRoute>
+                    <SubmissionFiles />
                 } />
                 <Route path="/track-submissions" exact element={
-                    <PrivateRoute>
-                        <TrackSubmissions />
-                    </PrivateRoute>
+                    <TrackSubmissions />
                 } />
                 <Route exact path="*" element={
                     <TrackSubmissions />} />

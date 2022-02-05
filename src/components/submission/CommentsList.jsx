@@ -7,25 +7,25 @@ import { Link } from 'react-router-dom'
 import { auth, db } from '../../database'
 import CommentsTab from './CommentsTab'
 
-const CommentsList = ({ postId, }) => {
+const CommentsList = ({ postId }) => {
     const classes = useStyles()
     const [user, setUser] = React.useState({})
     const [authy, setAuthy] = React.useState({})
+    const [comments, setComments] = React.useState([])
     const deleteComment = async (item) => {
         await deleteDoc(doc(db, "posts", postId, "comments", item.id))
     }
     React.useEffect(async () => {
         await onSnapshot(doc(db, "users", auth.currentUser?.uid), (querySnapshot) => {
-            console.log(querySnapshot.data());
             setAuthy(querySnapshot.data())
         })
     }, [])
-    const [comments, setComments] = React.useState([])
+
+
     React.useEffect(async () => {
         const unsubscribe = await onSnapshot(collection(db, "posts", postId, "comments"), (querySnapshot) => {
             let commentsData = []
             querySnapshot.forEach(async (comment) => {
-                // let sender = await getDoc(doc(db, "users", comment.data().senderId))
                 commentsData.push({ ...comment.data(), id: comment.id })
             })
             setComments(commentsData)
@@ -42,9 +42,10 @@ const CommentsList = ({ postId, }) => {
             console.log(err);
         })
     }
+
     return (
         <Paper elevation={4} style={{ padding: 20, marginTop: 20 }}>
-            <Stack direction="column" style={{ maxHeight: "100vh", overflowY: "scroll" }}>
+            <Stack direction="column" style={{ maxHeight: "100vh", overflowY: "auto" }}>
                 <CommentsTab postId={postId} />
                 {comments?.map((item) => {
                     return (
@@ -59,14 +60,14 @@ const CommentsList = ({ postId, }) => {
                                             <Avatar
                                                 size="small"
                                                 className={classes.smallAvatar}
-                                                alt={item?.sender?.displayName}
+                                                alt={item?.senderName}
                                                 src={item.imageUrl}
                                             />
                                             &nbsp;&nbsp;&nbsp;
                                             <Link
                                                 to={'/user/' + item.userId}
                                                 className={classes.name}>
-                                                <Typography>{item.sender?.displayName}</Typography>
+                                                <Typography>{item.senderName}</Typography>
                                             </Link>
                                         </div>
                                     </div>

@@ -20,15 +20,12 @@ const ListLeft = () => {
                 </ListItem>
             </Link>
             <Divider />
-            {user != null &&
-                <>
-                    <Link className="link" to='/submit-paper'>
-                        <ListItem button>
-                            <ListItemText primary='Submit Papers' />
-                        </ListItem>
-                    </Link>
-                    <Divider />
-                </>}
+            <Link className="link" to='/submit-paper'>
+                <ListItem button>
+                    <ListItemText primary='Submit Papers' />
+                </ListItem>
+            </Link>
+            <Divider />
             <Link className="link" to='/instructions'>
                 <ListItem button>
                     <ListItemText primary='Instructions for authors' />

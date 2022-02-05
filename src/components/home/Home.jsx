@@ -43,14 +43,9 @@ const useStyles = makeStyles((theme) => ({
         padding: '5px',
     },
     cover: {
-        overflow: 'hidden',
-        width: '70%',
-        margin: 'auto',
-        height: 0,
-        paddingTop: '55%', // 16:9,
-        marginTop: '30',
-        border: '1px solid blue',
+        width: 400
     },
+
     rootRight: {
         margin: 'auto',
         flexGrow: 1,
@@ -77,28 +72,18 @@ export default function Home(props) {
         <div className={classes.root}>
             <Paper elevation={4}>
                 <div className={classes.root1}>
-                    <Typography className={classes.typo1} align='center' color='inherit'>
-                        Original Research/Review Articles are invited for Vol 20 (1&2) to be
-                        released as Prof. Krishnamurthy commemoration volume at the
-                        beginning of his birth centenary year in September, 2021. Last date
-                        for acceptance of articles: 28th February, 2021.
-                    </Typography>
-                    <br />
-                    <Divider></Divider>
-                    <br />
                     <Typography
                         style={{
                             fontWeight: 'bold',
                             align: 'center',
-                            color: '#0000cd',
                         }}
-                        variant='h5'>
+                        variant='h5' color='primary'>
                         Founder
                     </Typography>
-                    <br />
                     <CardMedia
-                        className={classes.cover}
-                        // image={img}
+                        sx={{ maxWidth: 400, margin: 'auto' }}
+                        component="img"
+                        image="/images/vk 002.jpg"
                         title='Professor V. Krishnamurthy'
                     />
                     <Box className={classes.typo2}>
@@ -137,8 +122,8 @@ export default function Home(props) {
                     </Box>
                     <Divider></Divider>
                 </div>
-            </Paper>
+            </Paper >
             <br />
-        </div>
+        </div >
     );
 }

@@ -1,16 +1,28 @@
 import React from 'react';
 import Paper from '@mui/material/Paper';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Box from '@mui/material/Box';
 import makeStyles from '@mui/styles/makeStyles';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import MailIcon from '@mui/icons-material/Mail';
-
+import CardMedia from "@mui/material/CardMedia"
 const useStyles = makeStyles((theme) => ({
     root: {
         margin: 'auto',
         padding: theme.spacing(3),
-        textAlign: 'center',
+        textAlign: 'left',
     },
+    card: {
+        margin: "auto",
+        maxWidth: 900,
+        transition: "0.3s",
+        boxShadow: "0 8px 40px -12px rgba(0,0,0,0.3)",
+        "&:hover": {
+            boxShadow: "0 12px 45px -12.125px rgba(0,0,0,0.3)"
+        }
+    }
 }));
 
 const EditorialBoard = () => {
@@ -23,6 +35,41 @@ const EditorialBoard = () => {
                     Editorial Board
                 </Typography>
                 <br />
+                <Card sx={{ display: 'flex' }} className={classes.card}>
+                    <CardMedia
+                        sx={{ maxWidth: 250 }}
+                        component="img"
+                        image="/images/vk 002.jpg"
+                        alt="Live from space album cover"
+                    />
+                    <CardContent sx={{ flex: '1 0 auto' }}>
+                        <Typography
+                            variant='body1'
+                            sx={{ fontWeight: 'bold' }}>
+                            Chief Editor
+                        </Typography>
+                        <br></br>
+                        <Typography variant='body1'>
+                            Dr.M.Baluswami <br /><br />
+                            President, Krishnamurthy Institute of Algology <br />
+                            Former Director, Shift II, Self Financed Stream (June 2016-May 2019)
+                            <br />
+                            Madras Christian College, Chennai-600 059 <br />
+                            Former Associate Professor and Head (June 2013-May 2016)
+                            <br /> Department of Botany Madras Christian College, Chennai-600
+                            059 <br />
+
+                        </Typography>
+                        <br />
+                        <span
+                            style={{
+                                display: 'flex',
+                            }}>
+                            <MailIcon />
+                            &nbsp; balumcc@gmail.com
+                        </span>
+                    </CardContent>
+                </Card>
                 <div className={classes.chief}>
                     <Typography
                         variant='body2'
@@ -208,3 +255,5 @@ const EditorialBoard = () => {
 };
 
 export default EditorialBoard;
+
+

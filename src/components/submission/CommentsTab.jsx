@@ -15,6 +15,7 @@ const CommentsTab = ({ postId }) => {
             userView: false,
             senderId: auth.currentUser?.uid,
             text: comment,
+            senderName: auth.currentUser?.displayName,
             timestamp: serverTimestamp(),
         }).then(() =>
             setComment('')
